@@ -8,11 +8,11 @@ from trapepper import ResponseGenerator
 from trapepper import SpeechSynthesizer
 
 class DialogueMachine:
-    def __init__(self):
+    def __init__(self, genre_list_path=None):
         # Modules
         self.recognizer = SpeechRecognition()
         self.normalizer = QueryNormalizer()
-        self.parser = QueryParser()
+        self.parser = QueryParser(genre_list_path)
         self.action_determiner = ActionDeterminer()
         self.executor = QueryExecutor()
         self.response_generator = ResponseGenerator()
