@@ -11,11 +11,15 @@ class QueryParser:
                 self.genre2id[genre_name] = genre_id
 
         self.mec = MeCab.Tagger("-Owakati")
-        self.location_regex     = re.compile(r"(このあたり|NAIST|奈良|京都|大阪)")
+        self.nearby_regex       = re.compile(r"(このあたり|このへん|この近く)")
+        self.location_regex     = re.compile(r"(NAIST|奈良駅|京都駅|大阪駅|奈良|京都|大阪)")
         self.genre_regex        = re.compile("(" + "|".join(self.genre2id.keys()) + ")")
         self.requirements_regex = re.compile(r"(飲み放題)")
 
-        self.question_regex = re.compile(r"(どこ|どうやって|ある|どの|あり)")
+        self.where_regex    = re.compile(r"(どこ)")
+        self.how_regex      = re.compile(r"(どうやって)")
+        self.is_there_regex = re.compile(r"(ある|あり)")
+        self.which_regex    = re.compile(r"(どの)")
         self.details_regex  = re.compile(r"(詳しく|詳しい)")
         self.hello_regex    = re.compile(r"(こんにちは)")
         self.bye_regex      = re.compile(r"(さようなら|さよなら|バイバイ|ありがとう)")
@@ -23,8 +27,14 @@ class QueryParser:
 
     def guess_question_type(self, inp, words):
         for word in words:
-            q = self.question_regex.findall(word)
-            if q: return q[0]
+            q = self.where_regex.findall(word)
+            if q: return "where"
+            q = self.how_regex.findall(word)
+            if q: return "how"
+            q = self.is_there_regex.findall(word)
+            if q: return "is_there"
+            q = self.which_regex.findall(word)
+            if q: return "which"
         return None
 
     def guess_query_type(self, inp, words):
@@ -55,15 +65,17 @@ class QueryParser:
             sentence = inp
             words    = self.mec.parse(inp).strip().split()
 
-        entities     = {"looking_for": "レストラン"}
+        entities     = {"looking_for": "restaurant"}
         query_type   = self.guess_query_type(sentence, words)
 
         question     = self.guess_question_type(sentence, words)
-        location     = self.location_regex.findall(sentence)
         genre        = self.genre_regex.findall(sentence)
         requirements = self.requirements_regex.findall(sentence)
 
+        location     = self.location_regex.findall(sentence)
         if location:     entities["location"]     = location[0]
+        location     = self.nearby_regex.findall(sentence)
+        if location:     entities["location"]     = "nearby"
         if requirements: entities["requirements"] = requirements
         if question:     entities["question"] = question
         if genre:
@@ -78,6 +90,7 @@ class QueryParser:
 def __main__():
     qparser = QueryParser("./resources/small_search.tsv")
     inp = "このあたりにフランス料理のお店はありますか"
+    inp = "奈良駅の近くにフランス料理のお店はありますか"
     print(qparser.parse(inp))
 
 if __name__ == "__main__":
