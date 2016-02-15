@@ -2,11 +2,17 @@ import re
 import MeCab
 
 class QueryParser:
-    def __init__(self):
-        self.mec = MeCab.Tagger("-Owakati")
+    def __init__(self, genre_list_path):
+        
+        self.genre2id = {}
+        with open(genre_list_path, "r") as genre_list:
+            for lst in genre_list:
+                genre_id, genre_name = tuple(lst.strip().split())
+                self.genre2id[genre_name] = genre_id
 
+        self.mec = MeCab.Tagger("-Owakati")
         self.location_regex     = re.compile(r"(このあたり|NAIST|奈良|京都|大阪)")
-        self.genre_regex        = re.compile(r"(フランス|スペイン|日本|中華|ドイツ|ラーメン)")
+        self.genre_regex        = re.compile("(" + "|".join(self.genre2id.keys()) + ")")
         self.requirements_regex = re.compile(r"(飲み放題)")
 
         self.question_regex = re.compile(r"(どこ|どうやって|ある|どの|あり)")
@@ -58,9 +64,11 @@ class QueryParser:
         requirements = self.requirements_regex.findall(sentence)
 
         if location:     entities["location"]     = location[0]
-        if genre:        entities["genre"]        = genre[0]
         if requirements: entities["requirements"] = requirements
         if question:     entities["question"] = question
+        if genre:
+            entities["genre"]        = genre[0]
+            entities["genre_id"]     = self.genre2id[genre[0]]
 
         return {"query_type": query_type,
                 "raw_tokens": words,
@@ -68,8 +76,7 @@ class QueryParser:
                 }
 
 def __main__():
-    qparser = QueryParser()
-    # print(qparser.parse(["where", "is", "the", "nearby", "french", "restaurant"]))
+    qparser = QueryParser("./resources/small_search.tsv")
     inp = "このあたりにフランス料理のお店はありますか"
     print(qparser.parse(inp))
 
