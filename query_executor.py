@@ -19,12 +19,17 @@ class GeoCaller:
         except ValueError as e :
             print(e)
             print("Failed to access the API.")
-            return -1, -1, ""
+            return -1, -1, "error"
 
         data = fromstring(result.decode('utf-8'))
-        lat = data[2][0].text
-        lng = data[2][1].text
-        loc_name = data[5].text
+
+        # in case of wrong data structure
+        try:
+            lat = data[2][0].text
+            lng = data[2][1].text
+            loc_name = data[5].text
+        except:
+           return -1, -1, "error"
 
         return lat, lng, loc_name
 
@@ -54,7 +59,7 @@ class GnaviCaller:
             result = urllib.request.urlopen( url ).read()
         except ValueError :
             print("Failed to access the API.")
-            return -1, None
+            return -1, []
         data = json.loads( result.decode('utf-8') )
          
         # error occurs
@@ -63,7 +68,7 @@ class GnaviCaller:
                 print(data["message"])
             else :
                 print("Failed to get the data.")
-            return -1, None
+            return -1, []
          
         # get number of hits
         total_hit_count = None
@@ -133,8 +138,9 @@ class QueryExecutor:
 
     def execute(self, query):
         total, recv_data = self.gnavi_caller.call_api(query)
-        print(total)
-        self.gnavi_caller.print_data(recv_data)
+        return total, recv_data
+        #print(total)
+        #self.gnavi_caller.print_data(recv_data)
 
 class TestQueryExecutor:
     def __init__(self):
@@ -145,13 +151,14 @@ class TestQueryExecutor:
         lat, lng, place_name = self.geo_api.call_api("同志社前")
         
         # 範囲
-        range     = "1"
+        range     = "3"
 
         print("searching near " + place_name)
         query = [
           ( "format",       "json" ),
           ( "latitude",     lat    ),
           ( "longitude",    lng    ),
+          ( "input_coordinates_mode", 1),
           ( "hit_per_page", 100     ),
           ( "range",        range  )
         ]
