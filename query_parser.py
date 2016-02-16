@@ -12,13 +12,13 @@ class QueryParser:
 
         self.mec = MeCab.Tagger("-Owakati")
         self.nearby_regex       = re.compile(r"(このあたり|このへん|この近く)")
-        self.location_regex     = re.compile(r"(NAIST|奈良駅|京都駅|大阪駅|奈良|京都|大阪)")
+        self.location_regex     = re.compile(r"(NAIST|奈良先端|奈良駅|京都駅|大阪駅|奈良|京都|大阪)")
         self.genre_regex        = re.compile("(" + "|".join(self.genre2id.keys()) + ")")
         self.requirements_regex = re.compile(r"(飲み放題)")
 
         self.where_regex    = re.compile(r"(どこ)")
         self.how_regex      = re.compile(r"(どうやって)")
-        self.is_there_regex = re.compile(r"(ある|あり)")
+        self.is_there_regex = re.compile(r"(ある|あり|探し)")
         self.which_regex    = re.compile(r"(どの)")
         self.details_regex  = re.compile(r"(詳しく|詳しい)")
         self.hello_regex    = re.compile(r"(こんにちは)")

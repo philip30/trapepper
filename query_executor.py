@@ -2,6 +2,7 @@ import key.gnavi_key
 import sys
 import urllib.parse, urllib.request
 import json
+import query_parser
 from xml.etree.ElementTree import *
 
 class GeoCaller:
@@ -38,12 +39,19 @@ class GnaviCaller:
     def __init__(self):
         self.gnavi_key = key.gnavi_key.gnavi_keyid
         self.gnavi_url = key.gnavi_key.gnavi_url
+        self.require = ["location"]
 
     def is_str(self, data = None) :
       if isinstance(data, str) :
         return True
       else :
         return False
+
+    def are_enough_entities(self, entities):
+        for req in self.require:
+            if req not in entities.keys():
+                return False, req
+        return True, ""
 
     # return number of hit restaurants and data
     # if error occurs, return -1
@@ -64,8 +72,8 @@ class GnaviCaller:
          
         # error occurs
         if "error" in data :
-            if "message" in data :
-                print(data["message"])
+            if "message" in data["error"] :
+                print(data["error"]["message"])
             else :
                 print("Failed to get the data.")
             return -1, []
@@ -132,42 +140,96 @@ class GnaviCaller:
             print("\t".join( line ))
 
 
-class QueryExecutor:
-    def __init__(self):
-        self.gnavi_caller = GnaviCaller()
+class RestaurantAPIManager:
+    def __init__(self, entities):
+        self.entities = entities
+        self.api_caller = GnaviCaller()
 
-    def execute(self, query):
-        total, recv_data = self.gnavi_caller.call_api(query)
-        return total, recv_data
-        #print(total)
-        #self.gnavi_caller.print_data(recv_data)
+    def are_enough_entities(self):
+        print(self.entities)
+        return self.api_caller.are_enough_entities(self.entities)
 
-class TestQueryExecutor:
-    def __init__(self):
-        self.query_exec = QueryExecutor()
-        self.geo_api = GeoCaller()
+    def print_data(self, data):
+        self.api_caller.print_data(data)
 
-    def test(self):
-        lat, lng, place_name = self.geo_api.call_api("同志社前")
+    def call_api(self):
+        geo_api = GeoCaller()
+        lat, lng, place_name = geo_api.call_api(self.entities["location"])
         
-        # 範囲
-        range     = "3"
-
         print("searching near " + place_name)
         query = [
           ( "format",       "json" ),
           ( "latitude",     lat    ),
           ( "longitude",    lng    ),
           ( "input_coordinates_mode", 1),
-          ( "hit_per_page", 100     ),
-          ( "range",        range  )
+          ( "hit_per_page", 10     ),
+          ( "range",        5  ),
+          ( "category_s",   self.entities["genre_id"])
         ]
 
-        self.query_exec.execute(query)
+        count, api_result = self.api_caller.call_api(query)
+        if count == -1:
+            raise Exception("API Error")
+
+        return api_result
+
+
+class QueryExecutor:
+    def __init__(self):
+        pass
+
+    def run(self, action):
+        return self.execute(action)
+
+    def execute_restaurant(self, entities):
+        api_manager = RestaurantAPIManager(entities)
+        ret_data = {}
+
+        ret_data["looking_for"] = "restaurant"
+        ret_data["enough_entities"], ret_data["next_entity"] = api_manager.are_enough_entities()
+        if ret_data["enough_entities"] == False:
+            return ret_data
+        
+        ret_data["recv"] = api_manager.call_api()
+        if len(ret_data["recv"]["rest"]) > 0:
+            api_manager.print_data(ret_data["recv"])
+        return ret_data
+
+    def execute_question(self, action):
+        if action["entities"]["looking_for"] == "restaurant":
+            return self.execute_restaurant(action["entities"])
+        if action["entities"]["looking_for"] == "hotel":
+            pass
+
+    def execute(self, action):
+        if action["query_type"] == "question":
+            return self.execute_question(action)
+
+        if action["query_type"] == "hello":
+            pass
+
+        if action["query_type"] == "bye":
+            pass
+
+        
+class TestQueryExecutor:
+    def __init__(self):
+        self.query_exec = QueryExecutor()
+        pass
+
+    def test(self):
+        inp = "奈良先端近くの居酒屋を探して"
+
+        qparser = query_parser.QueryParser("./resources/small_search.tsv")
+        action = qparser.parse(inp)
+        print(action)
+        result = self.query_exec.run(action)
+        print(result)
+
 
 if __name__ == "__main__":
     # Test
-    test_query_exce = TestQueryExecutor()
-    test_query_exce.test()
+    test_query_exec = TestQueryExecutor()
+    test_query_exec.test()
     
 
