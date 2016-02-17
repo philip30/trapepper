@@ -25,10 +25,10 @@ class DialogueMachine:
         while True:
             inp = self.recognize()
             inp = self.normalize(inp)
-            entities, query, query_type = self.parse(inp)
+            parsed = self.parse(inp)
     
             # action determiner
-            action = self.comprehend(entities, query, query_type, self.last_state)
+            action = self.comprehend(parsed, self.last_state)
     
             # backend 
             data = self.execute_query(action)
@@ -55,8 +55,8 @@ class DialogueMachine:
         return self.parser.parse(inp)
 
     # state transition
-    def comprehend(self, entities, query, query_type, last_state):
-        action_type, new_state = self.action_determiner.determine(entities, query, query_type, last_state)
+    def comprehend(self, parsed, last_state):
+        action_type, new_state = self.action_determiner.determine(parsed, last_state)
         self.last_state = new_state
         return action_type
 

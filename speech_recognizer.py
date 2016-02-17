@@ -1,3 +1,3 @@
 class SpeechRecognition:
     def recognize(self):
-        return "this is a test."
+        return "このあたりにフランス料理のお店はありますか"
