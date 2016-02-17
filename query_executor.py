@@ -24,6 +24,8 @@ class QueryExecutor:
 
     def execute_question(self, entities):
         if entities["looking_for"] == "restaurant":
+            if entities["location"] == "nearby":
+                entities["location"] = "奈良先端科学技術大学院大学"
             return self.execute_restaurant(entities)
         if entities["looking_for"] == "hotel":
             pass
