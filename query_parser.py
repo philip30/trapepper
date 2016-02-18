@@ -1,5 +1,6 @@
 import re
 import MeCab
+from collections import defaultdict
 
 class QueryParser:
     def __init__(self, genre_list_path):
@@ -57,7 +58,10 @@ class QueryParser:
     #   requirements: "nomihodai"
     #   location: "nearby", "nara", "osaka", "kyoto"
     #   question: "where", "what", "which", "how"
+
         sentence, words = "", []
+        entities = defaultdict(str)
+
         if isinstance(inp, list):
             sentence = ''.join(inp)
             words    = inp
@@ -65,7 +69,7 @@ class QueryParser:
             sentence = inp
             words    = self.mec.parse(inp).strip().split()
 
-        entities     = {"looking_for": "restaurant"}
+        entities["looking_for"] = "restaurant"
         query_type   = self.guess_query_type(sentence, words)
 
         question     = self.guess_question_type(sentence, words)
