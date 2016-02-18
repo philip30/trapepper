@@ -1,6 +1,5 @@
 from trapepper.api import RestaurantAPIManager
 from trapepper.lib import Action, ActionType
-import exceptions
 
 class ActionDeterminer:
     def determine(self, parsed, last_state):
