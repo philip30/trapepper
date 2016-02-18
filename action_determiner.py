@@ -1,6 +1,6 @@
-
 from trapepper.api import RestaurantAPIManager
 from trapepper.lib import Action, ActionType
+import exceptions
 
 class ActionDeterminer:
     def determine(self, parsed, last_state):
@@ -8,6 +8,7 @@ class ActionDeterminer:
         query_type = parsed["query_type"]
         entities = parsed["entities"]
         raw_tokens = parsed["raw_tokens"]
+        action = None
         
         if query_type == "question":
             api_manager = RestaurantAPIManager(entities)
@@ -18,6 +19,11 @@ class ActionDeterminer:
                 action = Action(ActionType.pardon, missing_entities)
         elif query_type == "hello" or query_type == "bye":
             action = Action(ActionType.dialogue, query_type)
+        elif query_type == "pardon":
+            # TODO
+            # we have to implement pardon action
+            #action = Action(ActionType.dialogue, query_type)
+            pass
         elif query_type == "":
             action = Action(ActionType.details, entities)
 
