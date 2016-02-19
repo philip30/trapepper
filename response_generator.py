@@ -2,10 +2,10 @@ class ResponseGenerator:
     def generate_response(self, data):
         # Not enough query, ask again
         if data["enough_entities"] == False:
-            return "Pardon me, please state your question one more time"
+            return "Pardon me, please state your question one more time."
         # No restaurants found
         if len(data["recv"]["rest"]) == 0:
-            return "No restaurant found"
+            return "I am sorry, I could not find any restaurants."
         # Found restaurant(s)
         count = len(data["recv"]["rest"])
         if count > 1:
