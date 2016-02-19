@@ -23,27 +23,27 @@ class ResponseGenerator:
                     # found the restaurant's name and nearby train line
                      if "name" in rest and self.is_str( rest["name"] ):
                         if count > 1:
-                            response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + "."
+                            response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + ". "
                         else:
-                            response_str += "The restaurant name is " + rest["name"] + "."
-                        response_str += "Near there, there is a train line called " + access["line"] + " which should be taken to get there."
+                            response_str += "The restaurant name is " + rest["name"] + ". "
+                        response_str += "Near there, there is a train line called " + access["line"] + " which should be taken to get there. "
                     # could not find the restaurant's name, but nearby train line
                     else:
                         if count > 1:
-                            response_str += "I could not find the name of restaurant number " + str(idx) + "."
+                            response_str += "I could not find the name of restaurant number " + str(idx) + ". "
                         else:
-                            response_str += "I could not find the name of the restaurant."
-                        response_str += "But, near there, there is a train line called " + access["line"] + " which should be taken to get there."
+                            response_str += "I could not find the name of the restaurant. "
+                        response_str += "But, near there, there is a train line called " + access["line"] + " which should be taken to get there. "
                     # found nearby train line and station
                     if "station" in access and self.is_str( access["station"] ):
-                        response_str += "Furthermore, there is also a nearby train station called " + access["station"] + "."
+                        response_str += "Furthermore, there is also a nearby train station called " + access["station"] + ". "
                         # found nearby train line and station and walking minutes from the nearby station
                         if "walk" in access and self.is_str( access["walk"] ):
-                            response_str += "From there you can get to the place on foot within " + str(access["walk"]) + " minutes."
+                            response_str += "From there you can get to the place on foot within " + str(access["walk"]) + " minutes. "
                     else:
                         # found nearby train line and walking minutes from its nearby station
                         if "walk" in access and self.is_str( access["walk"] ):
-                            response_str += "And, from its nearest station you can get there on foot within " + str(access["walk"]) + " minutes."
+                            response_str += "And, from its nearest station you can get there on foot within " + str(access["walk"]) + " minutes. "
                 # could not find nearby train line
                 else:
                     # found nearby train station
@@ -51,20 +51,20 @@ class ResponseGenerator:
                         # found the restaurant's name
                          if "name" in rest and self.is_str( rest["name"] ):
                             if count > 1:
-                                response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + "."
+                                response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + ". "
                             else:
-                                response_str += "The restaurant name is " + rest["name"] + "."
-                            response_str += "Near there, there is a train station called " + access["line"] + "."
+                                response_str += "The restaurant name is " + rest["name"] + ". "
+                            response_str += "Near there, there is a train station called " + access["line"] + ". "
                         # could not find the restaurant's name
                         else:
                             if count > 1:
-                                response_str += "I could not find the name of restaurant number " + str(idx) + "."
+                                response_str += "I could not find the name of restaurant number " + str(idx) + ". "
                             else:
-                                response_str += "I could not find the name of the restaurant."
-                            response_str += "But, near there, there is a train station called " + access["station"] + "."
+                                response_str += "I could not find the name of the restaurant. "
+                            response_str += "But, near there, there is a train station called " + access["station"] + ". "
                         # found  walking minutes from the nearby station
                         if "walk" in access and self.is_str( access["walk"] ):
-                            response_str += "And from there you can get to the place on foot within " + str(access["walk"]) + " minutes."
+                            response_str += "And from there you can get to the place on foot within " + str(access["walk"]) + " minutes. "
                     # could not find nearby train station
                     else:
                         # found walking minutes from nearby train station
@@ -72,37 +72,37 @@ class ResponseGenerator:
                             # found the restaurant's name
                              if "name" in rest and self.is_str( rest["name"] ):
                                 if count > 1:
-                                    response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + "."
+                                    response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + ". "
                                 else:
-                                    response_str += "The restaurant name is " + rest["name"] + "."
-                                response_str += "If you try to walk from its nearest station, it will take about " + str(access["walk"]) + " minutes."
+                                    response_str += "The restaurant name is " + rest["name"] + ". "
+                                response_str += "If you try to walk from its nearest station, it will take about " + str(access["walk"]) + " minutes. "
                             # could not find the restaurant's name
                             else:
                                 if count > 1:
-                                    response_str += "I could not find the name of restaurant number " + str(idx) + "."
+                                    response_str += "I could not find the name of restaurant number " + str(idx) + ". "
                                 else:
-                                    response_str += "I could not find the name of the restaurant."
-                                response_str += "But, if you try to walk from its nearest station, it will take about " + str(access["walk"]) + " minutes."
+                                    response_str += "I could not find the name of the restaurant. "
+                                response_str += "But, if you try to walk from its nearest station, it will take about " + str(access["walk"]) + " minutes. "
                         # could not find name and access for this restaurant
                         else:
                             if count > 1:
-                                response_str += "I am sorry, I could not find the name and access details for the restaurant number " + str(idx)
+                                response_str += "I am sorry, I could not find the name and access details for the restaurant number " + str(idx) + ". "
                             else:
-                                response_str += "I am sorry, I could not find the name and access details for this restaurant.
+                                response_str += "I am sorry, I could not find the name and access details for this restaurant. "
             # could not find access for this restaurant
             else:
                 # found restaurant's name
                  if "name" in rest and self.is_str( rest["name"] ):
                     if count > 1:
-                        response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + "."
+                        response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + ". "
                     else:
-                        response_str += "The restaurant name is " + rest["name"] + "."
-                    response_str += "But, I am sorry, I could not find the access detail to get there."
+                        response_str += "The restaurant name is " + rest["name"] + ". "
+                    response_str += "But, I am sorry, I could not find the access detail to get there. "
                 # could not find restaurant's name
                 else:
                     if count > 1:
-                        response_str += "I am sorry, I could not find the name and access details for the restaurant number " + str(idx)
+                        response_str += "I am sorry, I could not find the name and access details for the restaurant number " + str(idx) + ". "
                     else:
-                        response_str += "I am sorry, I could not find the name and access details for this restaurant.
+                        response_str += "I am sorry, I could not find the name and access details for this restaurant. "
             idx += 1
         return response_str
