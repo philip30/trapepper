@@ -86,7 +86,7 @@ class ResponseGenerator:
                         # could not find name and access for this restaurant
                         else:
                             if count > 1:
-                                response_str += "I am sorry, I could not find the name and access details for the restaurant number " + str(count)
+                                response_str += "I am sorry, I could not find the name and access details for the restaurant number " + str(idx)
                             else:
                                 response_str += "I am sorry, I could not find the name and access details for this restaurant.
             # could not find access for this restaurant
@@ -101,7 +101,7 @@ class ResponseGenerator:
                 # could not find restaurant's name
                 else:
                     if count > 1:
-                        response_str += "I am sorry, I could not find the name and access details for the restaurant number " + str(count)
+                        response_str += "I am sorry, I could not find the name and access details for the restaurant number " + str(idx)
                     else:
                         response_str += "I am sorry, I could not find the name and access details for this restaurant.
             idx += 1
