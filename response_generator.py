@@ -21,7 +21,7 @@ class ResponseGenerator:
                 # found nearby train line
                 if "line" in access and self.is_str( access["line"] ):
                     # found the restaurant's name and nearby train line
-                    if "name" in rest:
+                     if "name" in rest and self.is_str( rest["name"] ):
                         if count > 1:
                             response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + "."
                         else:
@@ -49,7 +49,7 @@ class ResponseGenerator:
                     # found nearby train station
                     if "station" in access and self.is_str( access["station"] ):
                         # found the restaurant's name
-                        if "name" in rest:
+                         if "name" in rest and self.is_str( rest["name"] ):
                             if count > 1:
                                 response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + "."
                             else:
@@ -70,7 +70,7 @@ class ResponseGenerator:
                         # found walking minutes from nearby train station
                         if "walk" in access and self.is_str( access["walk"] ):
                             # found the restaurant's name
-                            if "name" in rest:
+                             if "name" in rest and self.is_str( rest["name"] ):
                                 if count > 1:
                                     response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + "."
                                 else:
@@ -92,7 +92,7 @@ class ResponseGenerator:
             # could not find access for this restaurant
             else:
                 # found restaurant's name
-                if "name" in rest:
+                 if "name" in rest and self.is_str( rest["name"] ):
                     if count > 1:
                         response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + "."
                     else:
