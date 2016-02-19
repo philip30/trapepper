@@ -92,5 +92,5 @@ class ResponseGenerator:
                         response_str += "I am sorry, I could not find the name and access details for the restaurant number " + str(count)
                     else:
                         response_str += "I am sorry, I could not find the name and access details for this restaurant.
-            count++
+            count += 1
         return response_str
