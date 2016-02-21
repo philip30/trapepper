@@ -15,6 +15,7 @@ class ActionDeterminer:
 
         if expecting_details and query_type == "pardon":
             query_type = last_state["query_type"]
+            entities["question"] = last_state["entities"]["question"]
             merge_entitiy(last_state["entities"], entities)
            
 
