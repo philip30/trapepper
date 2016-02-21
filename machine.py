@@ -7,6 +7,7 @@ from trapepper import ActionDeterminer
 from trapepper import QueryExecutor
 from trapepper import ResponseGenerator
 from trapepper import SpeechSynthesizer
+from trapepper import ResultFilterer
 from trapepper.util import log
 from trapepper.lib import ActionType
 import json
@@ -20,6 +21,7 @@ class DialogueMachine:
         self.parser = QueryParser(genre_list_path)
         self.action_determiner = ActionDeterminer()
         self.executor = QueryExecutor()
+        self.filterer = ResultFilterer()
         self.response_generator = ResponseGenerator()
         self.speech_synthesizer = SpeechSynthesizer()
         
@@ -68,7 +70,12 @@ class DialogueMachine:
     def execute_query(self, action, data):
         # Do a new query:
         if action.action_type == ActionType.exec_hotel:
-            return self.executor.execute(action)
+            result = self.executor.execute(action)
+            self.last_state["original_result"] = result
+            return result
+        elif action.action_type == ActionType.filter:
+            filtered_result = self.filterer.filter(action, self.last_state["original_result"])
+            return filtered_result
         else:
             return data
 

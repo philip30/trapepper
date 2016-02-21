@@ -4,7 +4,6 @@ from trapepper.util import log
 
 # DIALOGS
 def count_restaurant(data):
-    # TODO
     count = len(data["recv"]["rest"])
     if count > 1:
         response_str = "There are " + str(count) + " restaurants found. "
@@ -13,7 +12,6 @@ def count_restaurant(data):
     return response_str
 
 def ask_more_entity(action):
-    # TODO
     missing_entity = action.args.strip()
     if missing_entity == "location":
         return "すみません。場所は教えてください。"
@@ -21,18 +19,43 @@ def ask_more_entity(action):
         raise NotImplementedError()
 
 def pardon():
-    # TODO
     return "すみません。わかりませんでした。"
 
 def no_matching_restaurant():
     return "I am sorry, I could not find any restaurants."
+
+def which_one():
+    return "Please say the name of the restaurant you wanna go."
+
+def way_to_restaurant(rest, route_found):
+    if route_found:
+        return "This is the way to go to restaurant " + rest["name"] + "."
+    else:
+        return "Sorry I can't find a way to go to restaurant " + rest["name"]
+
+def restaurant_alternate_route(wtg, rest, access):
+    if len(wtg) == 0:
+        return way_to_restaurant(rest, False)
+    else:
+        ret = []
+        for i, acc in enumerate(wtg):
+            if i != 0:
+                ret.append("and also from there")
+            if acc == "line":
+                ret.append("There is a train line called " + access["line"] + " which should be taken to get there.")
+            elif acc == "station":
+                ret.append("There is a train station called " + access["station"] + " which should be taken to get there.")
+            elif acc == "walk":
+                ret.append("If you wanna walk")
+                ret.append("And, from its nearest station you can get there on foot within " + str(access["walk"]) + " minutes." )
+        return ret
 
 # ROUTINES
 def add_response(response, data):
     if type(data) == str:
         response.append(data)
     elif type(data) == list or type(data) == tuple:
-        response[len(response):] = list(data)
+        response.extend(data)
     else:
         response.append(data)
 
@@ -50,9 +73,27 @@ def is_missing_entity(action):
 def is_restaurant_empty(data):
     return len(data["recv"]["rest"]) == 0
 
+def select_route(data):
+    data = data["recv"]["rest"][0:1]
+    if len(data) != 1:
+        return which_one()
+    else:
+        rest = data[0]
+        ret  = []
+        if "access" in rest:
+            access = rest["access"]
+            ret.append(way_to_restaurant(rest, True))
+            way_to_go = []
+            if "line" in access: way_to_go.append("line")
+            if "station" in access: way_to_go.append("station")
+            if "walk" in access: way_to_go.append("walk")
+            add_response(ret, restaurant_alternate_route(way_to_go, rest, access))
+        else:
+            ret.append(way_to_restaurant(rest, False))
+        return ret
+            
+# ret
 class ResponseGenerator:
-    
-        
     def generate_response(self, action, data):
         responses = []
         say = lambda x: add_response(responses, x)
@@ -69,103 +110,9 @@ class ResponseGenerator:
                 say(count_restaurant(data))
         elif action.action_type == ActionType.dialogue:
             say(casual_chat(action.args))
-        #elif action.action_type == ActionType.filter:
-        #    pass 
+        elif action.action_type == ActionType.route:
+            say(select_route(data))
         else:
             raise NotImplementedError()
         return responses
 
-
-        idx = 1;
-        for rest in data["recv"]["rest"]:
-            # found access to restaurant
-            if "access" in rest:
-                access = rest["access"]
-                # found nearby train line
-                if "line" in access and self.is_str( access["line"] ):
-                    # found the restaurant's name and nearby train line
-                    if "name" in rest and self.is_str( rest["name"] ):
-                        if count > 1:
-                            response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + ". "
-                        else:
-                            response_str += "The restaurant name is " + rest["name"] + ". "
-                        response_str += "Near there, there is a train line called " + access["line"] + " which should be taken to get there. "
-                    # could not find the restaurant's name, but nearby train line
-                    else:
-                        if count > 1:
-                            response_str += "I could not find the name of restaurant number " + str(idx) + ". "
-                        else:
-                            response_str += "I could not find the name of the restaurant. "
-                        response_str += "But, near there, there is a train line called " + access["line"] + " which should be taken to get there. "
-                    # found nearby train line and station
-                    if "station" in access and self.is_str( access["station"] ):
-                        response_str += "Furthermore, there is also a nearby train station called " + access["station"] + ". "
-                        # found nearby train line and station and walking minutes from the nearby station
-                        if "walk" in access and self.is_str( access["walk"] ):
-                            response_str += "From there you can get to the place on foot within " + str(access["walk"]) + " minutes. "
-                    else:
-                        # found nearby train line and walking minutes from its nearby station
-                        if "walk" in access and self.is_str( access["walk"] ):
-                            response_str += "And, from its nearest station you can get there on foot within " + str(access["walk"]) + " minutes. "
-                # could not find nearby train line
-                else:
-                    # found nearby train sta:w
-                    tion
-                    if "station" in access and self.is_str( access["station"] ):
-                        # found the restaurant's name
-                        if "name" in rest and self.is_str( rest["name"] ):
-                            if count > 1:
-                                response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + ". "
-                            else:
-                                response_str += "The restaurant name is " + rest["name"] + ". "
-                            response_str += "Near there, there is a train station called " + access["line"] + ". "
-                        # could not find the restaurant's name
-                        else:
-                            if count > 1:
-                                response_str += "I could not find the name of restaurant number " + str(idx) + ". "
-                            else:
-                                response_str += "I could not find the name of the restaurant. "
-                            response_str += "But, near there, there is a train station called " + access["station"] + ". "
-                        # found  walking minutes from the nearby station
-                        if "walk" in access and self.is_str( access["walk"] ):
-                            response_str += "And from there you can get to the place on foot within " + str(access["walk"]) + " minutes. "
-                    # could not find nearby train station
-                    else:
-                        # found walking minutes from nearby train station
-                        if "walk" in access and self.is_str( access["walk"] ):
-                            # found the restaurant's name
-                            if "name" in rest and self.is_str( rest["name"] ):
-                                if count > 1:
-                                    response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + ". "
-                                else:
-                                    response_str += "The restaurant name is " + rest["name"] + ". "
-                                response_str += "If you try to walk from its nearest station, it will take about " + str(access["walk"]) + " minutes. "
-                            # could not find the restaurant's name
-                            else:
-                                if count > 1:
-                                    response_str += "I could not find the name of restaurant number " + str(idx) + ". "
-                                else:
-                                    response_str += "I could not find the name of the restaurant. "
-                                response_str += "But, if you try to walk from its nearest station, it will take about " + str(access["walk"]) + " minutes. "
-                        # could not find name and access for this restaurant
-                        else:
-                            if count > 1:
-                                response_str += "I am sorry, I could not find the name and access details for the restaurant number " + str(idx) + ". "
-                            else:
-                                response_str += "I am sorry, I could not find the name and access details for this restaurant. "
-            # could not find access for this restaurant
-            else:
-                # found restaurant's name
-                if "name" in rest and self.is_str( rest["name"] ):
-                    if count > 1:
-                        response_str += "Restaurant number " + str(idx) + " is called " + rest["name"] + ". "
-                    else:
-                        response_str += "The restaurant name is " + rest["name"] + ". "
-                    response_str += "But, I am sorry, I could not find the access detail to get there. "
-                # could not find restaurant's name
-                else:
-                    if count > 1:
-                        response_str += "I am sorry, I could not find the name and access details for the restaurant number " + str(idx) + ". "
-                    else:
-                        response_str += "I am sorry, I could not find the name and access details for this restaurant. "
-            idx += 1

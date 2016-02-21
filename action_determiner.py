@@ -12,21 +12,33 @@ class ActionDeterminer:
         entities = parsed["entities"]
         raw_tokens = parsed["raw_tokens"]
         expecting_details = last_state is not None
+
         if expecting_details and query_type == "pardon":
             query_type = last_state["query_type"]
             merge_entitiy(last_state["entities"], entities)
-            
+           
+
         if query_type == "question":
-            # Trying to query
-            api_manager = RestaurantAPIManager(entities)
-            api_satisfied, missing_entities = api_manager.are_enough_entities()
+            if entities["question"] == "is_there":
+                # Trying to query
+                api_manager = RestaurantAPIManager(entities)
+                api_satisfied, missing_entities = api_manager.are_enough_entities()
             
-            # If queries are OK, then execute
-            if api_satisfied:
-                action = Action(ActionType.exec_hotel, entities)
+                # If queries are OK, then execute
+                if api_satisfied:
+                    action = Action(ActionType.exec_hotel, entities)
+                else:
+                    action = Action(ActionType.pardon, missing_entities)
+            elif entities["question"] == "how":
+                # Route
+                if "original_result" in last_state:
+                    action = Action(ActionType.route)
+                else:
+                    action = Action(ActionType.pardon, "location")
             else:
-                action = Action(ActionType.pardon, missing_entities)
-            
+                raise NotImplementedError()
+
+
             # saving a new state
             if last_state is None:
                 last_state = parsed
