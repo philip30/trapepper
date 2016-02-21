@@ -1,7 +1,7 @@
 
 from enum import Enum
 
-ActionType = Enum("ActionType", "exec_hotel bye hello")
+ActionType = Enum("ActionType", "exec_hotel dialogue pardon")
 
 class Action:
     def __init__(self, action_type, args):
@@ -9,5 +9,5 @@ class Action:
         self.args = args
 
     def __str__(self):
-        return str(aciton_type) + ": " + str(self.args)
+        return str(self.action_type) + ": " + str(self.args)
 

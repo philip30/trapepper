@@ -1,4 +1,4 @@
 class SpeechSynthesizer:
     def synthesize(self, response):
-        print(response)
+        print("MACHINE:",response)
         return response
