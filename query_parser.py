@@ -31,7 +31,7 @@ class QueryParser:
             q = self.where_regex.findall(word)
             if q: return "where"
             q = self.how_regex.findall(word)
-            if q: return "how"
+            if q or "どうやって" in inp: return "how" # TODO parser cant handle this word because tokenizer split this word into 3 parts
             q = self.is_there_regex.findall(word)
             if q: return "is_there"
             q = self.which_regex.findall(word)

@@ -1,13 +1,13 @@
 
 from enum import Enum
 
-ActionType = Enum("ActionType", "exec_hotel bye hello")
+ActionType = Enum("ActionType", "exec_hotel dialogue pardon route filter")
 
 class Action:
-    def __init__(self, action_type, args):
+    def __init__(self, action_type, args=None):
         self.action_type = action_type
         self.args = args
 
     def __str__(self):
-        return str(aciton_type) + ": " + str(self.args)
+        return str(self.action_type) + ": " + str(self.args)
 
