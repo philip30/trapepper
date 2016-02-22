@@ -6,32 +6,32 @@ from trapepper.util import log
 def count_restaurant(data):
     count = len(data["recv"]["rest"])
     if count > 1:
-        response_str = "There are " + str(count) + " restaurants found. "
+        response_str = str(count) + "件のレストランがあります"
     else:
-        response_str = "There is one restaurant found. "
+        response_str = "ないですね"
     return response_str
 
 def ask_more_entity(action):
     missing_entity = action.args.strip()
     if missing_entity == "location":
-        return "すみません。場所は教えてください。"
+        return "どのあたりにあるレストランがご希望ですか"
     else:
         raise NotImplementedError()
 
 def pardon():
-    return "すみません。わかりませんでした。"
+    return "すみません。もう少し希望を述べていただけますか？"
 
 def no_matching_restaurant():
-    return "I am sorry, I could not find any restaurants."
+    return "ないですね"
 
 def which_one():
-    return "Please say the name of the restaurant you wanna go."
+    return "どのレストランに行きたいですか？"
 
 def way_to_restaurant(rest, route_found):
     if route_found:
-        return "This is the way to go to restaurant " + rest["name"] + "."
+        return rest["name"] + "へ行く道のりです。"
     else:
-        return "Sorry I can't find a way to go to restaurant " + rest["name"]
+        return rest["name"] + "へ行く道のりのご案内はできません。ごめんなさい。"
 
 def restaurant_alternate_route(wtg, rest, access):
     if len(wtg) == 0:
@@ -40,14 +40,13 @@ def restaurant_alternate_route(wtg, rest, access):
         ret = []
         for i, acc in enumerate(wtg):
             if i != 0:
-                ret.append("and also from there")
+                ret.append("他の行き方としては")
             if acc == "line":
-                ret.append("There is a train line called " + access["line"] + " which should be taken to get there.")
+                ret.append(access["line"] + "という電車がありますのでご乗車ください")
             elif acc == "station":
-                ret.append("There is a train station called " + access["station"] + " which should be taken to get there.")
+                ret.append(access["station"] + "という駅が最寄りにあります")
             elif acc == "walk":
-                ret.append("If you wanna walk")
-                ret.append("And, from its nearest station you can get there on foot within " + str(access["walk"]) + " minutes." )
+                ret.append("歩く場合は最寄りの駅から" + str(access["walk"]) + "分で着きます")
         return ret
 
 # ROUTINES
@@ -65,7 +64,7 @@ def casual_chat(dialog):
     elif dialog == "bye":
         return "バイバイ。"
     else:
-        return "That's interesting."
+        return "そうなんですか？"
 
 def is_missing_entity(action):
     return action.args is not None and len(action.args) > 0

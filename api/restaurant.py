@@ -1,3 +1,5 @@
+# -*- encoding: UTF-8 -*-
+
 import sys
 import urllib.parse, urllib.request
 import json

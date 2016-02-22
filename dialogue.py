@@ -8,6 +8,6 @@ parser.add_argument("--debug", action="store_true")
 args = parser.parse_args()
 
 if __name__ == "__main__":
-    dialogue = DialogueMachine(genre_list_path="./resources/small_search.tsv", debug=args.debug)
+    dialogue = DialogueMachine(genre_list_path="./trapepper/resources/small_search.tsv", debug=args.debug)
     dialogue.loop()
 
