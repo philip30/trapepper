@@ -4,6 +4,8 @@ from trapepper.util import log
 
 def merge_entitiy(last_state, entities):
     for key, value in entities.items():
+        print(value)
+        print(last_state[key])
         last_state[key] = value
 
 class ActionDeterminer:
@@ -12,7 +14,6 @@ class ActionDeterminer:
         entities = parsed["entities"]
         raw_tokens = parsed["raw_tokens"]
         expecting_details = last_state is not None
-
         if expecting_details and query_type == "pardon":
             query_type = last_state["query_type"]
             entities["question"] = last_state["entities"]["question"]

@@ -147,7 +147,6 @@ class RestaurantAPIManager:
         self.api_caller = GnaviCaller()
 
     def are_enough_entities(self):
-        print(self.entities)
         return self.api_caller.are_enough_entities(self.entities)
 
     def print_data(self, data):

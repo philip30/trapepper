@@ -1,6 +1,9 @@
 import re
 import MeCab
+import os
 from collections import defaultdict
+
+RESOURCE = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources/small_search.tsv")
 
 class QueryParser:
     def __init__(self, genre_list_path):
@@ -104,11 +107,11 @@ class QueryParser:
                 "raw_tokens": words,
                 "entities": entities
                 }
-        print(result)
+        print(str(result))
         return result
 
 def __main__():
-    qparser = QueryParser("./trapepper/resources/small_search.tsv")
+    qparser = QueryParser(RESOURCE)
     inp = "このあたりにフランス料理のお店はありますか"
     inp = "奈良駅の近くにフランス料理のお店はありますか"
     print(qparser.parse(inp))

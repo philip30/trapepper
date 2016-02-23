@@ -24,12 +24,10 @@ class DialogueMachine:
         self.filterer = ResultFilterer()
         self.response_generator = ResponseGenerator()
         self.speech_synthesizer = SpeechSynthesizer()
-        
-        # State
-        self.last_state = None
 
     def loop(self):
         data = None
+        state = None
         while True:
             inp = self.recognize()
             if inp is None: break
@@ -37,10 +35,11 @@ class DialogueMachine:
             parsed = self.parse(inp)
     
             # action determiner
-            action = self.comprehend(parsed, self.last_state)
+            action, new_state = self.comprehend(parsed, state)
     
             # backend
             data = self.execute_query(action, data)
+            if data is None: state = None 
             
             # generate response
             response = self.generate_response(action, data)
@@ -63,19 +62,14 @@ class DialogueMachine:
 
     # state transition
     def comprehend(self, parsed, last_state):
-        action_type, new_state = self.action_determiner.determine(parsed, last_state)
-        self.last_state = new_state
-        return action_type
+        action, new_state = self.action_determiner.determine(parsed, last_state)
+        return action, new_state
 
     def execute_query(self, action, data):
         # Do a new query:
         if action.action_type == ActionType.exec_hotel:
             result = self.executor.execute(action)
-            self.last_state["original_result"] = result
             return result
-        elif action.action_type == ActionType.filter:
-            filtered_result = self.filterer.filter(action, self.last_state["original_result"])
-            return filtered_result
         else:
             return data
 

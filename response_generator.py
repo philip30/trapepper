@@ -2,14 +2,41 @@
 from trapepper.lib import ActionType
 from trapepper.util import log
 
+MAX_SHOW = 3
+
+# State modification depending of which response being said 
+# i.e. STATE is a object returned by query_parser
+STATE = None
+
 # DIALOGS
 def count_restaurant(data):
     count = len(data["recv"]["rest"])
+    ret = []
     if count > 1:
-        response_str = str(count) + "件のレストランがあります"
+        ret.append(str(count) + "件のレストランがあります")
+        if count > MAX_SHOW:
+            # TODO
+            ret.append(which_one())
+        else:
+            add_response(ret, describe_restaurant(data))
     else:
-        response_str = "ないですね"
-    return response_str
+        ret.append("ないですね")
+    return ret
+
+def describe_restaurant(data):
+    ret = []
+    for i, rest in enumerate(data["recv"]["rest"]):
+        ret.extend(describe_single_restaurant(rest), i+1)
+    return ret
+
+def describe_single_restaurant(rest, number=0):
+    ret = []
+    if number != 0:
+        restaurant_type = extract_category(rest)
+        restaurant_type = "" if not restaurant_type else ("a " + restaurant_type)
+        restaurant_name = str(rest["name"])
+        ret.append("The " + to_number_str(number) + " matching restaurant is " + restaurant_type + " named " + restaurant_name + ".")
+    return ret
 
 def ask_more_entity(action):
     missing_entity = action.args.strip()
@@ -50,6 +77,23 @@ def restaurant_alternate_route(wtg, rest, access):
         return ret
 
 # ROUTINES
+def extract_category(rest):
+    code_category_name_s = []
+    if "code" in rest and "category_name_s" in rest["code"] :
+        for category_name_s in rest["code"]["category_name_s"] :
+            if self.is_str( category_name_s ) :
+                code_category_name_s.append( category_name_s )
+    if len(code_category_name_s) != 0:
+        return code_category_name_s[0] # return the first category # TODO is this correct?
+    else:
+        return None
+
+def to_number_str(number):
+    # TODO    
+    numbers = "first second third"
+    numbers = {i+1: num_str for i, num_str in enumerate(numbers.split())}
+    return numbers[number]
+
 def add_response(response, data):
     if type(data) == str:
         response.append(data)
@@ -94,6 +138,8 @@ def select_route(data):
 # ret
 class ResponseGenerator:
     def generate_response(self, action, data):
+        global STATE
+        STATE = data
         responses = []
         say = lambda x: add_response(responses, x)
         if action.action_type == ActionType.pardon:
