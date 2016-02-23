@@ -1,23 +1,20 @@
 # -*- encoding: UTF-8 -*-
 
-try :
-    from naoqi import ALProxy
-    
-    class SpeechSynthesizer:
-        def __init__(self, ip="192.168.43.171"):
-            self.tts = ALProxy("ALTextToSpeech", ip, 9559)
-            self.tts.setLanguage("Japanese")
-    
-        def synthesize(self, response):
-            print("MACHINE:",response)
-            tts.say(response)
-            return response
-# For machine without pepper SDK
-except ImportError:
-    class SpeechSynthesizer:
-        def synthesize(self, response):
-            print("MACHINE:", response)
-            return response
+import sys
+import os
+from subprocess import Popen, PIPE
+
+SERVER   = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pepper/server.py")
+NAOQI_PY = "/usr/bin/python"
+
+class SpeechSynthesizer:
+    def synthesize(self, response):
+        command = [NAOQI_PY, SERVER]
+        server_p = Popen(command, 0, shell=False, stdin=PIPE, stdout=PIPE, stderr=sys.stderr)
+        out, err  = server_p.communicate(input=bytes(response + "\n", "UTF-8"))
+        out = out.decode("utf-8").strip()
+        print("MACHINE:", out)
+        return out
 
 def __main__(self):
     speech_synthesizer = SpeechSynthesizer()
