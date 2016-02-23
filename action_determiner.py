@@ -61,7 +61,11 @@ class ActionDeterminer:
                         last_state["STATE"] = State.expect
                         action = Action(ActionType.pardon, missing_entities)
                 else:
-                    raise NotImplementedError()
+                    # TODO
+#                    print(last_state)
+#                    print(entities)
+#                    action = Action(ActionType.pardon, "location")
+                     raise NotImplementedError()
             elif entities["question"] == "how":
                 # Route
                 if last_state["STATE"] == State.search:

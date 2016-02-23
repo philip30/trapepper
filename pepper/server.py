@@ -3,26 +3,20 @@
 import sys
 
 # Pepper configuration
-NAME = "PepperSpeechSynthesis"
+NAME = "ALTextToSpeech"
 IP = "192.168.43.171"
 LANG = "Japanese"
 PORT = 9559
 
-try:
-    from naoqi import ALProxy
-    import sys
+from naoqi import ALProxy
+import sys
     
-    tts = ALProxy(NAME, IP, PORT)
-    tts.setLanguage(LANG)
-except Exception:
-    pass
+tts = ALProxy(NAME, IP, PORT)
+tts.setLanguage(LANG)
 
 for line in sys.stdin:
-    try:
-        tts.say(line)
-    except Exception:
-        pass
+    #try:
+    tts.say(line)
 
     print(line)
     sys.stdout.flush()
-
