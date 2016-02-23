@@ -32,6 +32,7 @@ class QueryParser:
         self.hello_regex    = re.compile(r"(こんにちは)")
         self.bye_regex      = re.compile(r"(さようなら|さよなら|バイバイ|ありがとう)")
         self.pardon_regex   = re.compile(r"(もう一度|聞こえない)")
+        self.recom_regex    = re.compile(r"((良|い)いレストラン)")
 
     def guess_question_type(self, inp, words):
         for word in words:
@@ -90,14 +91,16 @@ class QueryParser:
         location     = self.nearby_regex.findall(sentence)
         if location:     entities["location"]     = "nearby"
         closer       = self.closer_regex.findall(sentence)
-        if closer:       entities["location"] = "closer"
+        if closer:       entities["filter"] = {"distance":"closer"}
         if requirements: entities["requirements"] = requirements
         if question:     entities["question"] = question
         price        = self.price_low_regex.findall(sentence)
-        if price:        entities["price"] = "low"
+        if price:        entities["filter"] = {"price":"low"}
         price        = self.price_high_regex.findall(sentence)
-        if price:        entities["price"] = "high"
-        closer       = self.closer_regex.findall(sentence)
+        if price:        entities["filter"] = {"price":"high"}
+        recom        = self.recom_regex.findall(sentence)
+        if recom:       entities["filter"] = {"recom": "true"}
+
         if genre:
             entities["genre"]        = genre[0]
             entities["genre_id"]     = self.genre2id[genre[0]]

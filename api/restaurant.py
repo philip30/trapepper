@@ -162,7 +162,7 @@ class RestaurantAPIManager:
           ( "latitude",     lat    ),
           ( "longitude",    lng    ),
           ( "input_coordinates_mode", 1),
-          ( "hit_per_page", 10     ),
+          ( "hit_per_page", 100     ),
           ( "range",        5  ),
           ( "category_s",   self.entities["genre_id"])
         ]

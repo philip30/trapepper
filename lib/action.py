@@ -1,10 +1,10 @@
 
 from enum import Enum
 
-ActionType = Enum("ActionType", "exec_hotel dialogue pardon route filter")
+ActionType = Enum("ActionType", "exec_rest explain dialogue pardon route filter")
 
 class Action:
-    def __init__(self, action_type, args=None):
+    def __init__(self, action_type, args=""):
         self.action_type = action_type
         self.args = args
 

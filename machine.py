@@ -10,8 +10,6 @@ from trapepper import SpeechSynthesizer
 from trapepper import ResultFilterer
 from trapepper.util import log
 from trapepper.lib import ActionType
-import json
-
 
 class DialogueMachine:
     def __init__(self, genre_list_path=None, debug=False):
@@ -35,14 +33,13 @@ class DialogueMachine:
             parsed = self.parse(inp)
     
             # action determiner
-            action, new_state = self.comprehend(parsed, state)
-    
+            action, state = self.comprehend(parsed, state)
+            
             # backend
-            data = self.execute_query(action, data)
-            if data is None: state = None 
+            data = self.execute_query(action, state, data)
             
             # generate response
-            response = self.generate_response(action, data)
+            response = self.generate_response(action, data, state)
 
             # speech synthesis
             self.synthesize(response)
@@ -63,18 +60,24 @@ class DialogueMachine:
     # state transition
     def comprehend(self, parsed, last_state):
         action, new_state = self.action_determiner.determine(parsed, last_state)
+        log("Action Type:", action)
         return action, new_state
 
-    def execute_query(self, action, data):
+    def execute_query(self, action, state, data):
         # Do a new query:
-        if action.action_type == ActionType.exec_hotel:
-            result = self.executor.execute(action)
-            return result
-        else:
-            return data
+        if action.action_type == ActionType.exec_rest:
+            data = self.executor.execute(action)
+            self.filterer.reset(data)
+        
+        data, modified = self.filterer.filter(state)
 
-    def generate_response(self, action, data):
-        return self.response_generator.generate_response(action, data)
+        if not modified:
+            pass # do something with the action?
+        return data
+
+    def generate_response(self, action, data, filt):
+        if filt is not None: filt = filt["entities"]["filter"]
+        return self.response_generator.generate_response(action, data, filt)
 
     def synthesize(self, responses):
         for response_str in responses:

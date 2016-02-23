@@ -31,7 +31,7 @@ class QueryExecutor:
             pass
 
     def execute(self, action):
-        if action.action_type == ActionType.exec_hotel:
+        if action.action_type == ActionType.exec_rest:
             return self.execute_question(action.args)
 
 #        if action["query_type"] == "hello":

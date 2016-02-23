@@ -9,33 +9,40 @@ MAX_SHOW = 3
 STATE = None
 
 # DIALOGS
-def count_restaurant(data):
-    count = len(data["recv"]["rest"])
+def count_restaurant(data, filt):
     ret = []
-    if count > 1:
+    count = len(data)
+    if count > 0:
         ret.append(str(count) + "件のレストランがあります")
         if count > MAX_SHOW:
             # TODO
             ret.append(which_one())
         else:
-            add_response(ret, describe_restaurant(data))
+            add_response(ret, describe_restaurant(data, filt))
     else:
         ret.append("ないですね")
     return ret
 
-def describe_restaurant(data):
+def describe_restaurant(data, filt):
     ret = []
-    for i, rest in enumerate(data["recv"]["rest"]):
-        ret.extend(describe_single_restaurant(rest), i+1)
+    for i, rest in enumerate(data):
+        ret.extend(describe_single_restaurant(rest, filt, i+1))
     return ret
 
-def describe_single_restaurant(rest, number=0):
+def describe_single_restaurant(rest, filt=None, number=0):
     ret = []
     if number != 0:
         restaurant_type = extract_category(rest)
         restaurant_type = "" if not restaurant_type else ("a " + restaurant_type)
         restaurant_name = str(rest["name"])
-        ret.append("The " + to_number_str(number) + " matching restaurant is " + restaurant_type + " named " + restaurant_name + ".")
+        rest_str = "The " + to_number_str(number) + " restaurant is " + restaurant_type + " named " + restaurant_name
+        if filt is not None:
+            if "price" in filt:
+                rest_str += " with average budget is " + rest["budget"]
+            if "distance" in filt:
+                rest_str += " that can be reached by " + rest["access"]["walk"] + " minutes walk "
+        rest_str += "."
+        ret.append(rest_str)
     return ret
 
 def ask_more_entity(action):
@@ -81,8 +88,7 @@ def extract_category(rest):
     code_category_name_s = []
     if "code" in rest and "category_name_s" in rest["code"] :
         for category_name_s in rest["code"]["category_name_s"] :
-            if self.is_str( category_name_s ) :
-                code_category_name_s.append( category_name_s )
+            code_category_name_s.append( category_name_s )
     if len(code_category_name_s) != 0:
         return code_category_name_s[0] # return the first category # TODO is this correct?
     else:
@@ -114,10 +120,9 @@ def is_missing_entity(action):
     return action.args is not None and len(action.args) > 0
 
 def is_restaurant_empty(data):
-    return len(data["recv"]["rest"]) == 0
+    return len(data) == 0
 
 def select_route(data):
-    data = data["recv"]["rest"][0:1]
     if len(data) != 1:
         return which_one()
     else:
@@ -125,11 +130,14 @@ def select_route(data):
         ret  = []
         if "access" in rest:
             access = rest["access"]
-            ret.append(way_to_restaurant(rest, True))
+            accessible = lambda x: x in access and len(access[x]) != 0
+            
             way_to_go = []
-            if "line" in access: way_to_go.append("line")
-            if "station" in access: way_to_go.append("station")
-            if "walk" in access: way_to_go.append("walk")
+            if accessible("line"): way_to_go.append("line")
+            if accessible("station"): way_to_go.append("station")
+            if accessible("walk"): way_to_go.append("walk")
+            if len(way_to_go) != 0:
+                ret.append(way_to_restaurant(rest, True))
             add_response(ret, restaurant_alternate_route(way_to_go, rest, access))
         else:
             ret.append(way_to_restaurant(rest, False))
@@ -137,7 +145,7 @@ def select_route(data):
             
 # ret
 class ResponseGenerator:
-    def generate_response(self, action, data):
+    def generate_response(self, action, data, filt):
         global STATE
         STATE = data
         responses = []
@@ -147,12 +155,12 @@ class ResponseGenerator:
                 say(ask_more_entity(action))
             else:
                 say(pardon())
-        elif action.action_type == ActionType.exec_hotel:
+        elif action.action_type == ActionType.exec_rest or action.action_type == ActionType.explain:
             # Restaurant count
             if is_restaurant_empty(data):
                 say(no_matching_restaurant())
             else:
-                say(count_restaurant(data))
+                say(count_restaurant(data, filt))
         elif action.action_type == ActionType.dialogue:
             say(casual_chat(action.args))
         elif action.action_type == ActionType.route:
