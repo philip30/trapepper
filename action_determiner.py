@@ -9,7 +9,7 @@ State = Enum("Enum", "init expect search")
 def merge_entity(last_state, entities):
     for key, value in entities.items():
         if type(value) == dict:
-            if type(last_state[key]) != dict:
+            if type(last_state.get(key)) != dict:
                 last_state[key] = {}
             merge_entity(last_state[key], value)
         else:
