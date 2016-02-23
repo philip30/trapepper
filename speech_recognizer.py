@@ -45,7 +45,7 @@ class SpeechRecognition:
 
     # callback for calling Google Speech Recognition API
     # called by other thread created by main thread
-    def callback(recognizer, audio, res):
+    def callback(self, recognizer, audio, res):
         try:
             #res[0] = recognizer.recognize_google(audio) #for English
             res[0] = recognizer.recognize_google(audio, language="ja") #for Japanese
@@ -60,7 +60,7 @@ class SpeechRecognition:
             return False
     
     # threading function for detecting and recognizing speech
-    def threaded_listen(recognizer, microphone, res):
+    def threaded_listen(self, recognizer, microphone, res):
         flag = False
         with microphone as source:
             print("Say something!")
@@ -76,12 +76,12 @@ class SpeechRecognition:
                         pass
                 else: # speech has been detected, recognize it
                     if flag == False:
-                        flag = callback(recognizer, audio, res) # return success indicator
+                        flag = self.callback(recognizer, audio, res) # return success indicator
     
     # start listening by creating other thread because of
     # error in listen() function if using main thread
-    def start_listen(recognizer, microphone, res):
-        listener_thread = threading.Thread(target=threaded_listen(recognizer, microphone, res))
+    def start_listen(self, recognizer, microphone, res):
+        listener_thread = threading.Thread(target=self.threaded_listen(recognizer, microphone, res))
         listener_thread.daemon = True
         listener_thread.start()
 
@@ -115,6 +115,6 @@ class SpeechRecognition:
             res_str = [""]
         
             # start listening and recognizing input speech sound
-            start_listen(rec, mic, res_str)
+            self.start_listen(rec, mic, res_str)
         
             return res_str[0]
