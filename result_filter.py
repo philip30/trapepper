@@ -1,3 +1,4 @@
+import re
 
 class ResultFilterer:
     
@@ -18,7 +19,7 @@ class ResultFilterer:
                     ret = list(filter(lambda x: len(x["budget"]) != 0, ret))
                     ret = list(sorted(ret, key=lambda x: int(x["budget"]), reverse=(value == "high")))[0:1]
                 elif fit == "distance":
-                    ret = list(sorted(ret, key=lambda x: int(x["access"]["walk"])))[0:1]
+                    ret = list(sorted(ret, key=lambda x: int(re.findall("[0-9]+", x["access"]["walk"])[0])))[0:1]
                 elif fit == "recom":
                     ret = [x[0]] # recommendation is the first hit :)
                 else:
