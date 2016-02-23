@@ -35,15 +35,14 @@ class QueryParser:
         self.recom_regex    = re.compile(r"((良|い)いレストラン)")
 
     def guess_question_type(self, inp, words):
-        for word in words:
-            q = self.where_regex.findall(word)
-            if q: return "where"
-            q = self.how_regex.findall(word)
-            if q or "どうやって" in inp: return "how" # TODO parser cant handle this word because tokenizer split this word into 3 parts
-            q = self.is_there_regex.findall(word)
-            if q: return "is_there"
-            q = self.which_regex.findall(word)
-            if q: return "which"
+        q = self.where_regex.findall(inp)
+        if q: return "where"
+        q = self.how_regex.findall(inp)
+        if q: return "how"
+        q = self.is_there_regex.findall(inp)
+        if q: return "is_there"
+        q = self.which_regex.findall(inp)
+        if q: return "which"
         return None
 
     def guess_query_type(self, inp, words):
