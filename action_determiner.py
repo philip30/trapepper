@@ -9,7 +9,7 @@ State = Enum("Enum", "init expect search")
 def merge_entity(last_state, entities):
     for key, value in entities.items():
         if type(value) == dict:
-            if type(last_state[key]) != dict:
+            if type(last_state.get(key)) != dict:
                 last_state[key] = {}
             merge_entity(last_state[key], value)
         else:
@@ -42,32 +42,41 @@ class ActionDeterminer:
         else:
             last_state = parsed
             last_state["STATE"] = State.init
+            last_state["STATE_HISTORY"] = [State.init]
 
         # updating state
         last_state["raw_tokens"] = raw_tokens
+        print("last_state:")
+        print(last_state)
 
         if query_type == "question":
             if entities["question"] == "is_there":
-                if last_state["STATE"] != State.search or different_location(last_state, parsed):
-                    # Trying to query
-                    api_manager = RestaurantAPIManager(entities)
-                    api_satisfied, missing_entities = api_manager.are_enough_entities()
+                # reset conversation
+                # if different_location(last_state, parsed):
+                # Trying to query
+                api_manager = RestaurantAPIManager(entities)
+                api_satisfied, missing_entities = api_manager.are_enough_entities()
                 
-                    # If queries are OK, then execute
-                    if api_satisfied:
-                        last_state["STATE"] = State.search
-                        action = Action(ActionType.exec_rest, entities)
-                    else:
-                        last_state["STATE"] = State.expect
-                        action = Action(ActionType.pardon, missing_entities)
+                # If queries are OK, then execute
+                if api_satisfied:
+                    last_state["STATE"] = State.search
+                    last_state["STATE_HISTORY"] = [State.init, State.search]
+                    action = Action(ActionType.exec_rest, entities)
                 else:
-                    raise NotImplementedError()
-            elif entities["question"] == "how":
+                    last_state["STATE"] = State.expect
+                    last_state["STATE_HISTORY"] = [State.init, State.expect]
+                    action = Action(ActionType.pardon, missing_entities)
+            elif entities["question"] == "how" or entities["question"] == "where":
                 # Route
-                if last_state["STATE"] == State.search:
+                if State.search in last_state["STATE_HISTORY"]:
                     action = Action(ActionType.route)
                 else:
                     action = Action(ActionType.pardon, "location")
+            elif entities["question"] == "which":
+                if last_state["STATE"] == State.search:
+                    action = Action(ActionType.explain)
+                else:
+                    actoin = Action(ActionType.pardon, location)
             else:
                 raise NotImplementedError()
 

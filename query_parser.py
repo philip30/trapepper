@@ -16,7 +16,7 @@ class QueryParser:
 
         self.mec = MeCab.Tagger("-Owakati")
         self.nearby_regex       = re.compile(r"(このあたり|このへん|この近く)")
-        self.location_regex     = re.compile(r"(NAIST|奈良先端|奈良駅|京都駅|大阪駅|奈良|京都|大阪)")
+        self.location_regex     = re.compile(r"(NAIST|奈良先端|生駒駅|奈良駅|京都駅|大阪駅|奈良|京都|大阪|生駒)")
         self.genre_regex        = re.compile("(" + "|".join(self.genre2id.keys()) + ")")
         self.requirements_regex = re.compile(r"(飲み放題)")
         self.price_low_regex    = re.compile(r"(安い)")
@@ -25,7 +25,7 @@ class QueryParser:
 
         self.where_regex    = re.compile(r"(どこ)")
         self.how_regex      = re.compile(r"(どうやって)")
-        self.is_there_regex = re.compile(r"(ある|あり|探し)")
+        self.is_there_regex = re.compile(r"(ある|あり|探し|行きたい)")
         self.which_regex    = re.compile(r"(どの)")
         self.details_regex  = re.compile(r"(詳しく|詳しい)")
         self.others_regex   = re.compile(r"(他の|他に|他は)")
@@ -33,17 +33,17 @@ class QueryParser:
         self.bye_regex      = re.compile(r"(さようなら|さよなら|バイバイ|ありがとう)")
         self.pardon_regex   = re.compile(r"(もう一度|聞こえない)")
         self.recom_regex    = re.compile(r"((良|い)いレストラン)")
+        self.number_of_restaurant = re.compile(r"([0-9]+|[一二三四五六七八九十]+)番目")
 
     def guess_question_type(self, inp, words):
-        for word in words:
-            q = self.where_regex.findall(word)
-            if q: return "where"
-            q = self.how_regex.findall(word)
-            if q or "どうやって" in inp: return "how" # TODO parser cant handle this word because tokenizer split this word into 3 parts
-            q = self.is_there_regex.findall(word)
-            if q: return "is_there"
-            q = self.which_regex.findall(word)
-            if q: return "which"
+        q = self.where_regex.findall(inp)
+        if q: return "where"
+        q = self.how_regex.findall(inp)
+        if q: return "how"
+        q = self.is_there_regex.findall(inp)
+        if q: return "is_there"
+        q = self.number_of_restaurant.findall(inp)# self.which_regex.findall(inp)
+        if q: return "which"
         return None
 
     def guess_query_type(self, inp, words):
@@ -100,6 +100,8 @@ class QueryParser:
         if price:        entities["filter"] = {"price":"high"}
         recom        = self.recom_regex.findall(sentence)
         if recom:       entities["filter"] = {"recom": "true"}
+        which        = self.number_of_restaurant.findall(sentence)
+        if which:       entities["filter"] = {"which": which}
 
         if genre:
             entities["genre"]        = genre[0]

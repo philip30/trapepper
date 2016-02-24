@@ -16,6 +16,9 @@ class SpeechSynthesizer:
         print("MACHINE:", out)
         return out
 
-def __main__(self):
+def __main__():
     speech_synthesizer = SpeechSynthesizer()
     speech_synthesizer.synthesize("こんにちは！")
+
+if __name__ == '__main__':
+    __main__()

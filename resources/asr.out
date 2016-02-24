@@ -1,0 +1,5 @@
+sentence1:  焼肉 。
+wseq1: <s> 焼肉+名詞 </s>
+phseq1: silB | y a k i n i k u | silE
+cmscore1: 0.520 0.063 1.000
+score1: -14482.899414 (AM: -14406.480469  LM: -76.419266)
