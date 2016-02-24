@@ -66,6 +66,7 @@ class DialogueMachine:
     def execute_query(self, action, state, data):
         # Do a new query:
         if action.action_type == ActionType.exec_rest:
+            self.synthesize(["レストランを探しますね。"])
             data = self.executor.execute(action)
             self.filterer.reset(data)
         

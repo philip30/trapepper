@@ -41,9 +41,9 @@ def describe_single_restaurant(rest, filt=None, number=0, describe_route=False):
                 rest_str += "大体" + rest["budget"] + "円ほどでお食事が楽しめます。"
             if "distance" in filt:
                 rest_str += "徒歩" + rest["access"]["walk"] + "分ほどで着きますよ。"
-        add_response(ret, restaurant_alternate_route(rest, rest['access']))
         rest_str += "."
         ret.append(rest_str)
+        add_response(ret, restaurant_alternate_route(rest, rest['access']))
     return ret
 
 def ask_more_entity(action):
@@ -80,11 +80,11 @@ def restaurant_alternate_route(rest, access):
         ret = []
         ret.append(way_to_restaurant(rest, True))
         for i, acc in enumerate(wtg):
-            if i != 0:
-                ret.append("他の行き方としては")
+            # if i != 0:
+            #     ret.append("他の行き方としては")
             if acc == "line":
                 ret.append(access["line"] + "という電車がありますのでご乗車ください")
-            elif acc == "station":
+            elif acc == "station" and not access.get("line"):
                 ret.append(access["station"] + "という駅が最寄りにあります")
             elif acc == "walk":
                 ret.append("歩く場合は最寄りの駅から" + str(access["walk"]) + "分で着きます")

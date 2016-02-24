@@ -25,7 +25,7 @@ class QueryParser:
 
         self.where_regex    = re.compile(r"(どこ)")
         self.how_regex      = re.compile(r"(どうやって)")
-        self.is_there_regex = re.compile(r"(ある|あり|探し)")
+        self.is_there_regex = re.compile(r"(ある|あり|探し|行きたい)")
         self.which_regex    = re.compile(r"(どの)")
         self.details_regex  = re.compile(r"(詳しく|詳しい)")
         self.others_regex   = re.compile(r"(他の|他に|他は)")
@@ -33,7 +33,7 @@ class QueryParser:
         self.bye_regex      = re.compile(r"(さようなら|さよなら|バイバイ|ありがとう)")
         self.pardon_regex   = re.compile(r"(もう一度|聞こえない)")
         self.recom_regex    = re.compile(r"((良|い)いレストラン)")
-        self.number_of_restaurant = re.compile(r"([0-9]+)番目")
+        self.number_of_restaurant = re.compile(r"([0-9]+|[一二三四五六七八九十]+)番目")
 
     def guess_question_type(self, inp, words):
         q = self.where_regex.findall(inp)
