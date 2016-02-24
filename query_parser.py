@@ -16,7 +16,7 @@ class QueryParser:
 
         self.mec = MeCab.Tagger("-Owakati")
         self.nearby_regex       = re.compile(r"(このあたり|このへん|この近く)")
-        self.location_regex     = re.compile(r"(NAIST|奈良先端|奈良駅|京都駅|大阪駅|奈良|京都|大阪)")
+        self.location_regex     = re.compile(r"(NAIST|奈良先端|生駒駅|奈良駅|京都駅|大阪駅|奈良|京都|大阪|生駒)")
         self.genre_regex        = re.compile("(" + "|".join(self.genre2id.keys()) + ")")
         self.requirements_regex = re.compile(r"(飲み放題)")
         self.price_low_regex    = re.compile(r"(安い)")
@@ -33,6 +33,7 @@ class QueryParser:
         self.bye_regex      = re.compile(r"(さようなら|さよなら|バイバイ|ありがとう)")
         self.pardon_regex   = re.compile(r"(もう一度|聞こえない)")
         self.recom_regex    = re.compile(r"((良|い)いレストラン)")
+        self.number_of_restaurant = re.compile(r"([0-9]+)番目")
 
     def guess_question_type(self, inp, words):
         q = self.where_regex.findall(inp)
@@ -41,7 +42,7 @@ class QueryParser:
         if q: return "how"
         q = self.is_there_regex.findall(inp)
         if q: return "is_there"
-        q = self.which_regex.findall(inp)
+        q = self.number_of_restaurant.findall(inp)# self.which_regex.findall(inp)
         if q: return "which"
         return None
 
@@ -99,6 +100,8 @@ class QueryParser:
         if price:        entities["filter"] = {"price":"high"}
         recom        = self.recom_regex.findall(sentence)
         if recom:       entities["filter"] = {"recom": "true"}
+        which        = self.number_of_restaurant.findall(sentence)
+        if which:       entities["filter"] = {"which": which}
 
         if genre:
             entities["genre"]        = genre[0]

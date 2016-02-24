@@ -26,21 +26,22 @@ def count_restaurant(data, filt):
 def describe_restaurant(data, filt):
     ret = []
     for i, rest in enumerate(data):
-        ret.extend(describe_single_restaurant(rest, filt, i+1))
+        ret.extend(describe_single_restaurant(rest, filt, i+1, len(data) == 1))
     return ret
 
-def describe_single_restaurant(rest, filt=None, number=0):
+def describe_single_restaurant(rest, filt=None, number=0, describe_route=False):
     ret = []
     if number != 0:
         restaurant_type = extract_category(rest)
         restaurant_type = "" if not restaurant_type else ("a " + restaurant_type)
         restaurant_name = str(rest["name"])
-        rest_str = "The " + to_number_str(number) + " restaurant is " + restaurant_type + " named " + restaurant_name
+        rest_str = restaurant_name + "についてご案内します。"
         if filt is not None:
             if "price" in filt:
-                rest_str += " with average budget is " + rest["budget"]
+                rest_str += "大体" + rest["budget"] + "円ほどでお食事が楽しめます。"
             if "distance" in filt:
-                rest_str += " that can be reached by " + rest["access"]["walk"] + " minutes walk "
+                rest_str += "徒歩" + rest["access"]["walk"] + "分ほどで着きますよ。"
+        add_response(ret, restaurant_alternate_route(rest, rest['access']))
         rest_str += "."
         ret.append(rest_str)
     return ret
@@ -67,11 +68,17 @@ def way_to_restaurant(rest, route_found):
     else:
         return rest["name"] + "へ行く道のりのご案内はできません。ごめんなさい。"
 
-def restaurant_alternate_route(wtg, rest, access):
+def restaurant_alternate_route(rest, access):
+    accessible = lambda x: x in access and len(access[x]) != 0
+    wtg = []
+    if accessible("line"): wtg.append("line")
+    if accessible("station"): wtg.append("station")
+    if accessible("walk"): wtg.append("walk")
     if len(wtg) == 0:
         return way_to_restaurant(rest, False)
     else:
         ret = []
+        ret.append(way_to_restaurant(rest, True))
         for i, acc in enumerate(wtg):
             if i != 0:
                 ret.append("他の行き方としては")
@@ -130,15 +137,8 @@ def select_route(data):
         ret  = []
         if "access" in rest:
             access = rest["access"]
-            accessible = lambda x: x in access and len(access[x]) != 0
             
-            way_to_go = []
-            if accessible("line"): way_to_go.append("line")
-            if accessible("station"): way_to_go.append("station")
-            if accessible("walk"): way_to_go.append("walk")
-            if len(way_to_go) != 0:
-                ret.append(way_to_restaurant(rest, True))
-            add_response(ret, restaurant_alternate_route(way_to_go, rest, access))
+            add_response(ret, restaurant_alternate_route(rest, access))
         else:
             ret.append(way_to_restaurant(rest, False))
         return ret
