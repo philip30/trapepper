@@ -13,7 +13,7 @@ def count_restaurant(data, filt):
     ret = []
     count = len(data)
     if count > 0:
-        ret.append(str(count) + "件のレストランがあります")
+        if count > 1: ret.append(str(count) + "件のレストランがあります")
         if count > MAX_SHOW:
             # TODO
             ret.append(which_one())
@@ -36,12 +36,11 @@ def describe_single_restaurant(rest, filt=None, number=0, describe_route=False):
         restaurant_type = "" if not restaurant_type else ("a " + restaurant_type)
         restaurant_name = str(rest["name"])
         rest_str = restaurant_name + "についてご案内します。"
-        if filt is not None:
-            if "price" in filt:
-                rest_str += "大体" + rest["budget"] + "円ほどでお食事が楽しめます。"
-            if "distance" in filt:
-                rest_str += "徒歩" + rest["access"]["walk"] + "分ほどで着きますよ。"
-        rest_str += "."
+        # if filt is not None:
+        if "price" in filt:
+            rest_str += "大体" + rest["budget"] + "円ほどでお食事が楽しめます。"
+        if "distance" in filt:
+            rest_str += "徒歩" + rest["access"]["walk"] + "分ほどで着きますよ。"
         ret.append(rest_str)
         add_response(ret, restaurant_alternate_route(rest, rest['access']))
     return ret
@@ -83,11 +82,11 @@ def restaurant_alternate_route(rest, access):
             # if i != 0:
             #     ret.append("他の行き方としては")
             if acc == "line":
-                ret.append(access["line"] + "という電車がありますのでご乗車ください")
-            elif acc == "station" and not access.get("line"):
-                ret.append(access["station"] + "という駅が最寄りにあります")
+                ret.append(access["line"] + "にご乗車ください。")
+            if acc == "station":
+                ret.append(access["station"] + "という駅が最寄りにあります。")
             elif acc == "walk":
-                ret.append("歩く場合は最寄りの駅から" + str(access["walk"]) + "分で着きます")
+                ret.append("最寄りの駅から" + str(access["walk"]) + "分で着きます。")
         return ret
 
 # ROUTINES

@@ -16,7 +16,7 @@ class QueryParser:
 
         self.mec = MeCab.Tagger("-Owakati")
         self.nearby_regex       = re.compile(r"(このあたり|このへん|この近く)")
-        self.location_regex     = re.compile(r"(NAIST|奈良先端|生駒駅|奈良駅|京都駅|大阪駅|奈良|京都|大阪|生駒)")
+        self.location_regex     = re.compile(r"(長野駅|東京駅|NAIST|奈良先端|生駒駅|奈良駅|京都駅|大阪駅|長野|奈良|京都|大阪|生駒|東京)")
         self.genre_regex        = re.compile("(" + "|".join(self.genre2id.keys()) + ")")
         self.requirements_regex = re.compile(r"(飲み放題)")
         self.price_low_regex    = re.compile(r"(安い)")
@@ -34,6 +34,7 @@ class QueryParser:
         self.pardon_regex   = re.compile(r"(もう一度|聞こえない)")
         self.recom_regex    = re.compile(r"((良|い)いレストラン)")
         self.number_of_restaurant = re.compile(r"([0-9]+|[一二三四五六七八九十]+)番目")
+        self.secret_null_pointer = re.compile(r"(ぬるぽ)")
 
     def guess_question_type(self, inp, words):
         q = self.where_regex.findall(inp)
@@ -102,6 +103,9 @@ class QueryParser:
         if recom:       entities["filter"] = {"recom": "true"}
         which        = self.number_of_restaurant.findall(sentence)
         if which:       entities["filter"] = {"which": which}
+
+        null_secrets      = self.secret_null_pointer.findall(sentence)
+        if null_secrets: entities["secret"] = "null"
 
         if genre:
             entities["genre"]        = genre[0]

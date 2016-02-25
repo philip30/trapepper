@@ -54,18 +54,21 @@ class ActionDeterminer:
                 # reset conversation
                 # if different_location(last_state, parsed):
                 # Trying to query
-                api_manager = RestaurantAPIManager(entities)
-                api_satisfied, missing_entities = api_manager.are_enough_entities()
-                
-                # If queries are OK, then execute
-                if api_satisfied:
-                    last_state["STATE"] = State.search
-                    last_state["STATE_HISTORY"] = [State.init, State.search]
-                    action = Action(ActionType.exec_rest, entities)
+                if last_state["STATE"] != State.search:
+                    api_manager = RestaurantAPIManager(entities)
+                    api_satisfied, missing_entities = api_manager.are_enough_entities()
+                    
+                    # If queries are OK, then execute
+                    if api_satisfied:
+                        last_state["STATE"] = State.search
+                        last_state["STATE_HISTORY"] = [State.init, State.search]
+                        action = Action(ActionType.exec_rest, entities)
+                    else:
+                        last_state["STATE"] = State.expect
+                        last_state["STATE_HISTORY"] = [State.init, State.expect]
+                        action = Action(ActionType.pardon, missing_entities)
                 else:
-                    last_state["STATE"] = State.expect
-                    last_state["STATE_HISTORY"] = [State.init, State.expect]
-                    action = Action(ActionType.pardon, missing_entities)
+                    action = Action(ActionType.explain)
             elif entities["question"] == "how" or entities["question"] == "where":
                 # Route
                 if State.search in last_state["STATE_HISTORY"]:

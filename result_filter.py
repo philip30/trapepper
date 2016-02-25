@@ -36,8 +36,20 @@ class ResultFilterer:
                             '八': 7,
                             '九': 8,
                             '十': 9,
+                            '0': 0,
+                            '1': 1,
+                            '2':2,
+                            '3':3,
+                            '4':4,
+                            '5':5,
+                            '6':6,
+                            '7':7,
+                            '8':8,
+                            '9':9
                             }
-                    ret = [ret[converter.get(value[0], int(value[0]) - 1)]]
+                    print(value[0])
+                    print(converter.get(value[0]))
+                    ret = [ret[converter.get(value[0])]] #, int(value[0]) - 1)]]
                 else:
                     raise NotImplementedError
         print(len(ret))
